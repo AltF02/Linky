@@ -1,11 +1,20 @@
-use warp::Filter;
+#![feature(proc_macro_hygiene, decl_macro)]
 
-#[tokio::main]
-async fn main() {
-    let hello = warp::path!("hello" / String)
-        .map(|name| format!("Hello, {}!", name));
+mod redirect;
+mod api;
 
-    warp::serve(hello)
-        .run(([127, 0, 0, 1], 3030))
-        .await
+use rocket::*;
+use rocket::{
+    response::{Redirect, content},
+    http::RawStr,
+};
+use rocket_contrib::serve::{StaticFiles};
+use rocket_contrib::databases::postgres;
+
+use redirect::static_rocket_route_info_for_redirect;
+
+fn main() {
+    rocket::ignite()
+        .mount("/", routes![redirect])
+        .launch();
 }
