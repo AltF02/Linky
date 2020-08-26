@@ -1,42 +1,13 @@
-use diesel::pg::PgConnection;
-use r2d2;
-use r2d2_diesel::ConnectionManager;
-use rocket::{Outcome, Request, State};
-use rocket::http::Status;
-use rocket::request::{self, FromRequest};
-use std::env;
-use std::ops::Deref;
+use tokio_postgres::{Client, NoTls, Error, Config};
+use r2d2::Pool;
 
-type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
-type PooledConnection = r2d2::PooledConnection<ConnectionManager<PgConnection>>;
-
-pub fn init_pool() -> Pool {
-    let manager: ConnectionManager<PgConnection> = ConnectionManager::<PgConnection>::new(database_url());
-    Pool::new(manager).expect("db pool")
-}
-
-fn database_url() -> String {
-    env::var("DATABASE_URL").expect("DATABASE_URL not found")
-}
-
-pub struct DbConn(pub PooledConnection);
-
-impl<'a, 'r> FromRequest<'a, 'r> for DbConn {
-    type Error = ();
-
-    fn from_request(request: &'a Request<'r>) -> request::Outcome<DbConn, Self::Error> {
-        let pool = request.guard::<State<Pool>>()?;
-        match pool.get() {
-            Ok(conn) => Outcome::Success(DbConn(conn)),
-            Err(_) => Outcome::Failure((Status::ServiceUnavailable, ())),
-        }
-    }
-}
-
-impl Deref for DbConn {
-    type Target = PgConnection;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
+pub(crate) fn init_database() -> Pool<_> {
+    let mut cfg = Config::new();
+    cfg.host("localhost");
+    cfg.user("postgres");
+    cfg.password("password123");
+    cfg.dbname("postgres");
+    cfg.port(5432);
+    let mgr = Manager::new(cfg, tokio_postgres::NoTls);
+    Pool::new(mgr, 16)
 }
