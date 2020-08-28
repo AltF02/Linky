@@ -4,7 +4,7 @@ use diesel::{Queryable, Insertable};
 use serde::{Serialize, Deserialize};
 
 #[database("postgres")]
-pub struct DbConn(PgConnection);
+pub(crate) struct DbConn(PgConnection);
 
 #[derive(Queryable, Serialize)]
 pub(crate) struct Link {
@@ -15,7 +15,7 @@ pub(crate) struct Link {
 
 #[derive(Insertable, Deserialize)]
 #[table_name="links"]
-pub struct NewLink {
+pub(crate) struct NewLink {
     redirect: String
 }
 
