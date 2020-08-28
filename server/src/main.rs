@@ -1,25 +1,41 @@
-#![feature(proc_macro_hygiene, decl_macro)]
+#![feature(decl_macro)]
 
-mod redirect;
-mod api;
+#[macro_use]
+extern crate diesel;
+
 mod connection;
+mod schema;
+mod api;
 
-use rocket::*;
-use rocket::{
-    response::{Redirect, content},
-    http::RawStr,
-};
-use rocket_contrib::serve::{StaticFiles};
+use rocket::{self, get, routes};
+use diesel::prelude::*;
 
-use redirect::static_rocket_route_info_for_redirect;
+use connection::*;
+use api::handler::*;
+use rocket::response::Redirect;
+use schema::links;
+
+
+#[get("/<path>")]
+fn redirect(conn: DbConn, path: String) -> Redirect {
+    let result: Vec<String> = links::table
+        .select(links::columns::redirect)
+        .filter(links::columns::path.eq(&path))
+        .limit(1)
+        .load(&*conn)
+        .unwrap();
+    Redirect::to(format!("{}", result[0]))
+}
 
 #[get("/")]
 fn index() -> &'static str {
-    "Hello, world!"
+    "Hello, World!"
 }
 
 fn main() {
     rocket::ignite()
+        .attach(DbConn::fairing())
         .mount("/", routes![redirect, index])
+        .mount("/api/", routes![get_links, create_link])
         .launch();
 }

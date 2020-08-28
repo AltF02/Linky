@@ -1,13 +1,21 @@
-use tokio_postgres::{Client, NoTls, Error, Config};
-use r2d2::Pool;
+use crate::schema::links;
+use rocket_contrib::databases::{database, diesel::PgConnection};
+use diesel::{Queryable, Insertable};
+use serde::{Serialize, Deserialize};
 
-pub(crate) fn init_database() -> Pool<_> {
-    let mut cfg = Config::new();
-    cfg.host("localhost");
-    cfg.user("postgres");
-    cfg.password("password123");
-    cfg.dbname("postgres");
-    cfg.port(5432);
-    let mgr = Manager::new(cfg, tokio_postgres::NoTls);
-    Pool::new(mgr, 16)
+#[database("postgres")]
+pub struct DbConn(PgConnection);
+
+#[derive(Queryable, Serialize)]
+pub(crate) struct Link {
+    id: i32,
+    redirect: String,
+    path: String
 }
+
+#[derive(Insertable, Deserialize)]
+#[table_name="links"]
+pub struct NewLink {
+    redirect: String
+}
+
