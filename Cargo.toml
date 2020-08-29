@@ -1,5 +1,5 @@
 [package]
-name = "linky_server"
+name = "linky"
 version = "0.1.0"
 authors = ["Matthew"]
 edition = "2018"
@@ -15,4 +15,4 @@ rand = "0.7.3"
 [dependencies.rocket_contrib]
 version = "0.4.5"
 default-features = false
-features = ["json", "diesel_postgres_pool", "handlebars_templates", "tera_templates"]
+features = ["json", "diesel_postgres_pool", "handlebars_templates", "tera_templates", "serve"]

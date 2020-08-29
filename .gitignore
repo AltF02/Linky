@@ -5,9 +5,9 @@
 /.pnp
 .pnp.js
 /.idea
-/server/target
-/server/.env
-/server/Rocket.toml
+/target
+/.env
+/Rocket.toml
 
 # testing
 /coverage

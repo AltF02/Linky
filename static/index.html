@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Linky</title>
+    <script>
+        function getLinks() {
+            axios.get('/api/links')
+                .then(response => {
+                    const links = response.data;
+                    console.log(links);
+                })
+                .catch(error => console.error(error));
+        }
+
+        function createLink() {
+            axios.post('/api/new', {
+                redirect: document.getElementById('link_txt_id').value
+            })
+            .then((response) => {
+                const div = document.getElementById('link_result');
+                const h3 = document.createElement('h3')
+                h3.innerHTML = window.location.host + '/' + response.data.path;
+
+                div.appendChild(h3);
+            })
+            .catch(error => console.log(error))
+        }
+    </script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <button onclick="createLink()">Create Link</button>
+    <label for="link_txt_id">
+        <input name="linkTxt" type="text" maxlength="50" id="link_txt_id" class="linkField"/>
+    </label>
+    <div class="Link" id="link_result">
+    </div>
+</body>
+</html>

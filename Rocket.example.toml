@@ -1,0 +1,13 @@
+[development]
+port = 3000
+log = "normal"
+
+[development.databases]
+postgres = { url = "postgres://postgres:postgres@localhost/postgres"}
+
+[production]
+port = 2000
+log = "critical"
+
+[production.databases]
+postgres = { url = "postgres://postgres:postgres3@123.430.35.198/postgres"}

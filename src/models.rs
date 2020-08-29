@@ -1,10 +1,6 @@
 use crate::schema::links;
-use rocket_contrib::databases::{database, diesel::PgConnection};
 use diesel::{Queryable, Insertable};
 use serde::{Serialize, Deserialize};
-
-#[database("postgres")]
-pub(crate) struct DbConn(PgConnection);
 
 #[derive(Queryable, Serialize)]
 pub(crate) struct Link {
@@ -18,4 +14,3 @@ pub(crate) struct Link {
 pub(crate) struct NewLink {
     redirect: String
 }
-

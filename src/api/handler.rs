@@ -1,12 +1,14 @@
 use rocket::{self, get, post};
 use rocket_contrib::json::Json;
 use crate::connection::*;
+use crate::models::*;
 use diesel::prelude::*;
 use crate::schema::links;
 
 use rand::{thread_rng, Rng};
 use rand::distributions::Alphanumeric;
 use std::iter;
+
 
 #[get("/links")]
 pub(crate) fn get_links(conn: DbConn) -> Json<Vec<Link>> {
