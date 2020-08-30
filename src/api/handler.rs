@@ -10,7 +10,7 @@ use rand::distributions::Alphanumeric;
 use std::iter;
 
 
-#[get("/links")]
+#[get("/links", rank = 4)]
 pub(crate) fn get_links(conn: DbConn) -> Json<Vec<Link>> {
     let links = links::table
         .order(links::columns::id.desc())
@@ -33,4 +33,23 @@ pub(crate) fn create_link(conn: DbConn, new_link: Json<NewLink>) -> Json<Link> {
         .unwrap();
 
     Json(result)
+}
+
+#[get("/links/<id>", rank = 2)]
+pub(crate) fn get_link_by_id(conn: DbConn, id: i32) -> Json<Vec<Link>> {
+    let link = links::table
+        .filter(links::columns::id.eq(id))
+        .load(&*conn)
+        .unwrap();
+    Json(link)
+}
+
+#[get("/links/<url>", rank = 3)]
+pub(crate) fn get_link_by_url(conn: DbConn, url: String) -> Json<Vec<Link>> {
+    let links = links::table
+        .filter(links::columns::redirect.eq(url))
+        .load(&*conn)
+        .unwrap();
+
+    Json(links)
 }

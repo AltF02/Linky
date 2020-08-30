@@ -27,7 +27,11 @@ fn redirect(conn: DbConn, path: String) -> Option<Redirect> {
         .load(&*conn)
         .unwrap();
     if result.len() > 0 {
-        Some(Redirect::to(format!("{}", result[0])))
+        if result[0].starts_with("http://") || result[0].starts_with("https://") {
+            Some(Redirect::to(format!("{}", result[0])))
+        } else {
+            Some(Redirect::to(format!("https://{}", result[0])))
+        }
     } else {
         None
     }
@@ -43,6 +47,6 @@ fn main() {
         .attach(DbConn::fairing())
         .mount("/", routes![index, redirect])
         .mount("/ui", StaticFiles::from("static").rank(1))
-        .mount("/api/", routes![get_links, create_link])
+        .mount("/api/", routes![get_links, create_link, get_link_by_id, get_link_by_url])
         .launch();
 }

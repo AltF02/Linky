@@ -8,4 +8,4 @@ RUN cargo build
 
 EXPOSE 3000
 
-CMD ["linky"]
+CMD linky
